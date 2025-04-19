@@ -1,0 +1,44 @@
+<div class="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
+  <div
+    class="w-[calc(100%-2rem)] mx-auto bg-white rounded-xl shadow-md overflow-hidden"
+  >
+    <div class="bg-gradient-to-r from-blue-500 to-indigo-600 p-6 text-white">
+      <h1 class="text-3xl font-bold">Budget Calculator</h1>
+      <p class="mt-2 text-blue-100">
+        Plan and manage your finances with our intuitive budget calculator tool
+      </p>
+    </div>
+
+    <div class="p-6">
+      <div class="mb-8 bg-blue-50 p-4 rounded-lg border border-blue-200">
+        <h2 class="text-lg font-semibold text-blue-800 mb-2">How to use:</h2>
+        <ol class="list-decimal pl-5 text-gray-700 space-y-1">
+          <li>
+            Select your desired date range using the start and end month pickers
+          </li>
+          <li>
+            The calculator will automatically process your budget for the
+            selected period
+          </li>
+        </ol>
+      </div>
+
+      <div
+        class="bg-white rounded-lg border border-gray-200 p-4 mb-6 shadow-sm"
+      >
+        <app-budget-header (dateRangeChanged)="onDateRangeChanged($event)" />
+      </div>
+
+      <div class="bg-white rounded-lg border border-gray-200 p-4 shadow-sm">
+        <app-exel-file-budget #exelFileBudget />
+      </div>
+    </div>
+
+    <div class="bg-gray-50 px-6 py-4 border-t border-gray-200">
+      <p class="text-sm text-gray-500 text-center">
+        This budget calculator helps you plan your expenses and income over
+        custom time periods. Export your data anytime for further analysis.
+      </p>
+    </div>
+  </div>
+</div>

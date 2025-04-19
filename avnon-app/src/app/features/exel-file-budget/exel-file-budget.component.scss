@@ -1,0 +1,113 @@
+@use '@angular/material' as mat;
+
+.month-selector {
+  margin: 20px 20px 0;
+  padding: 15px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+}
+
+.selector-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.month-field {
+  width: 180px;
+}
+
+.random-button {
+  min-width: 150px;
+}
+
+.budget-excel-container {
+  overflow-x: auto;
+  margin: 20px;
+  position: relative; 
+}
+
+.budget-table {
+  border-collapse: collapse;
+  width: 100%;
+  min-width: 1200px;
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #ccc;
+  padding: 8px;
+  text-align: center;
+}
+
+th {
+  background-color: #f2f2f2;
+  font-weight: bold;
+  position: sticky;
+  top: 0;
+}
+
+thead tr:first-child th {
+  background-color: #e0e0e0;
+}
+
+input[type="number"] {
+  width: 90px;
+  padding: 4px;
+  border: 1px solid transparent;
+  text-align: right;
+  background-color: #f9f9f9;
+  &:focus {
+    outline: none;
+    border: 1px solid #4d90fe;
+    background-color: #fff;
+  }
+}
+
+.subtotal, .total, .closing-balance {
+  font-weight: bold;
+  background-color: #f0f8ff;
+}
+
+.profit {
+  color: green;
+  font-weight: bold;
+}
+
+.loss {
+  color: red;
+  font-weight: bold;
+}
+
+tr:nth-child(odd) {
+  background-color: #f9f9f9;
+}
+
+tr:hover {
+  background-color: #f0f0f0;
+}
+
+.context-menu {
+  position: fixed;
+  z-index: 1000;
+  background: white;
+  border: 1px solid #ccc;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+  min-width: 120px;
+  padding: 5px 0;
+}
+
+.context-menu-item {
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  
+  &:hover {
+    background-color: #f0f0f0;
+  }
+}
