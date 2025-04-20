@@ -27,6 +27,26 @@ export interface SalariesAndWages {
   [key: string]: number;
 }
 
+export interface CustomCategoryRow {
+  id: string;
+  label: string;
+}
+
+export interface CustomCategory {
+  id: string;
+  name: string;
+  type: 'income' | 'expenses';
+  rows: CustomCategoryRow[];
+  values: { [month: string]: { [rowId: string]: number, subTotal: number } };
+}
+
+export interface CustomCategories {
+  [categoryId: string]: {
+    subTotal: number;
+    [rowId: string]: number;
+  };
+}
+
 export interface Budget {
   income: Income;
   expenses: Expenses;
@@ -34,6 +54,7 @@ export interface Budget {
   profitLoss: number;
   openingBalance: number;
   closingBalance: number;
+  customCategories: CustomCategories;
 }
 
 export interface Income {

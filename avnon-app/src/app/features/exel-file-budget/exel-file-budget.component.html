@@ -1,95 +1,354 @@
 <div class="budget-excel-container">
+  <div 
+    style="visibility: hidden; position: fixed"
+    [style.left]="contextMenuPosition.x"
+    [style.top]="contextMenuPosition.y"
+  >
+    <button
+      mat-button
+      [matMenuTriggerFor]="contextMenu"
+      #menuTrigger="matMenuTrigger"
+    ></button>
+  </div>
+  
+  <mat-menu #contextMenu="matMenu">
+    <button mat-menu-item (click)="applyToAllCells()">
+      <span>Apply to all</span>
+    </button>
+  </mat-menu>
+
   <table class="budget-table" #budgetTable>
     <thead>
       <tr>
         <th>Category</th>
         <th *ngFor="let month of months">{{ month }}</th>
+        <th class="action-column"></th>
       </tr>
     </thead>
     <tbody>
       <tr>
-        <th [attr.colspan]="months.length + 1">General Income</th>
+        <th class="main-category" [attr.colspan]="months.length + 1">Income</th>
+        <th class="action-column category-action-column">
+          <span 
+            class="add-category-icon" 
+            (click)="addCustomCategory('income')" 
+            tabindex="0" 
+            role="button" 
+            (keydown.enter)="addCustomCategory('income')"
+            aria-label="Add new income category">New Income Category</span>
+        </th>
+      </tr>
+      
+      <tr>
+        <th class="sub-category" [attr.colspan]="months.length + 1">General Income</th>
+        <th></th>
       </tr>
       <tr>
         <td>Sales</td>
         <td *ngFor="let month of months; let colIndex = index">
-          <input
-            [(ngModel)]="budgetData[month].income.generalIncome.sales"
-            (change)="calculateTotals(month)"
-            (focus)="onInputFocus($event, 0, colIndex)"
-          />
+          <div class="input-container">
+            <input
+              [(ngModel)]="budgetData[month].income.generalIncome.sales"
+              (change)="calculateTotals(month)"
+              (focus)="onInputFocus($event, 0, colIndex)"
+              (contextmenu)="onRightClick($event, month, 'income.generalIncome.sales')"
+            />
+          </div>
         </td>
+        <td></td>
       </tr>
       <tr>
         <td>Commission</td>
         <td *ngFor="let month of months; let colIndex = index">
-          <input
-            [(ngModel)]="budgetData[month].income.generalIncome.commission"
-            (change)="calculateTotals(month)"
-            (focus)="onInputFocus($event, 1, colIndex)"
+          <div class="input-container">
+            <input
+              [(ngModel)]="budgetData[month].income.generalIncome.commission"
+              (change)="calculateTotals(month)"
+              (focus)="onInputFocus($event, 1, colIndex)"
+              (contextmenu)="onRightClick($event, month, 'income.generalIncome.commission')"
+            />
+          </div>
+        </td>
+        <td class="add-icon-cell" *ngIf="customGeneralIncomeRows.length === 0">
+          <span 
+            class="add-row-icon" 
+            (click)="addCustomRowForCategory('generalIncome')" 
+            tabindex="0" 
+            role="button" 
+            (keydown.enter)="addCustomRowForCategory('generalIncome')"
+            aria-label="Add new general income row">+</span>
+        </td>
+        <td *ngIf="customGeneralIncomeRows.length > 0"></td>
+      </tr>
+      
+      <tr *ngFor="let customRow of customGeneralIncomeRows; let i = index; let last = last">
+        <td class="editable-label">
+          <input 
+            class="label-input" 
+            [(ngModel)]="customRow.label" 
+            placeholder="Enter label" 
           />
         </td>
+        <td *ngFor="let month of months; let colIndex = index">
+          <div class="input-container">
+            <input
+              [(ngModel)]="budgetData[month].income.generalIncome[customRow.id]"
+              (change)="calculateTotals(month)"
+              (focus)="onInputFocus($event, 2 + i, colIndex)"
+              (contextmenu)="onRightClick($event, month, 'income.generalIncome.' + customRow.id)"
+            />
+          </div>
+        </td>
+        <td class="add-icon-cell" *ngIf="last">
+          <span 
+            class="add-row-icon" 
+            (click)="addCustomRowForCategory('generalIncome')" 
+            tabindex="0" 
+            role="button" 
+            (keydown.enter)="addCustomRowForCategory('generalIncome')"
+            aria-label="Add new general income row">+</span>
+        </td>
+        <td *ngIf="!last"></td>
       </tr>
+      
       <tr>
         <td>Subtotal</td>
         <td *ngFor="let month of months" class="subtotal">
           {{ budgetData[month].income.generalIncome.subTotal | number : "1.2-2" }}
         </td>
+        <td></td>
       </tr>
 
       <tr>
-        <th [attr.colspan]="months.length + 1">Other Income</th>
+        <th class="sub-category" [attr.colspan]="months.length + 1">Other Income</th>
+        <th></th>
       </tr>
       <tr>
         <td>Training</td>
         <td *ngFor="let month of months; let colIndex = index">
-          <input
-            [(ngModel)]="budgetData[month].income.otherIncome.training"
-            (change)="calculateTotals(month)"
-            (focus)="onInputFocus($event, 2, colIndex)"
-          />
+          <div class="input-container">
+            <input
+              [(ngModel)]="budgetData[month].income.otherIncome.training"
+              (change)="calculateTotals(month)"
+              (focus)="onInputFocus($event, 3 + customGeneralIncomeRows.length, colIndex)"
+              (contextmenu)="onRightClick($event, month, 'income.otherIncome.training')"
+            />
+          </div>
         </td>
+        <td></td>
       </tr>
       <tr>
         <td>Consulting</td>
         <td *ngFor="let month of months; let colIndex = index">
-          <input
-            [(ngModel)]="budgetData[month].income.otherIncome.consulting"
-            (change)="calculateTotals(month)"
-            (focus)="onInputFocus($event, 3, colIndex)"
+          <div class="input-container">
+            <input
+              [(ngModel)]="budgetData[month].income.otherIncome.consulting"
+              (change)="calculateTotals(month)"
+              (focus)="onInputFocus($event, 4 + customGeneralIncomeRows.length, colIndex)"
+              (contextmenu)="onRightClick($event, month, 'income.otherIncome.consulting')"
+            />
+          </div>
+        </td>
+        <td class="add-icon-cell" *ngIf="customOtherIncomeRows.length === 0">
+          <span 
+            class="add-row-icon" 
+            (click)="addCustomRowForCategory('otherIncome')" 
+            tabindex="0" 
+            role="button" 
+            (keydown.enter)="addCustomRowForCategory('otherIncome')"
+            aria-label="Add new other income row">+</span>
+        </td>
+        <td *ngIf="customOtherIncomeRows.length > 0"></td>
+      </tr>
+      
+      <tr *ngFor="let customRow of customOtherIncomeRows; let i = index; let last = last">
+        <td class="editable-label">
+          <input 
+            class="label-input" 
+            [(ngModel)]="customRow.label" 
+            placeholder="Enter label" 
           />
         </td>
+        <td *ngFor="let month of months; let colIndex = index">
+          <div class="input-container">
+            <input
+              [(ngModel)]="budgetData[month].income.otherIncome[customRow.id]"
+              (change)="calculateTotals(month)"
+              (focus)="onInputFocus($event, 5 + customGeneralIncomeRows.length + i, colIndex)"
+              (contextmenu)="onRightClick($event, month, 'income.otherIncome.' + customRow.id)"
+            />
+          </div>
+        </td>
+        <td class="add-icon-cell" *ngIf="last">
+          <span 
+            class="add-row-icon" 
+            (click)="addCustomRowForCategory('otherIncome')" 
+            tabindex="0" 
+            role="button" 
+            (keydown.enter)="addCustomRowForCategory('otherIncome')"
+            aria-label="Add new other income row">+</span>
+        </td>
+        <td *ngIf="!last"></td>
       </tr>
+      
       <tr>
         <td>Subtotal</td>
         <td *ngFor="let month of months" class="subtotal">
           {{ budgetData[month].income.otherIncome.subTotal | number : "1.2-2" }}
         </td>
+        <td></td>
       </tr>
 
+      <ng-container *ngFor="let category of customIncomeCategories">
+        <tr>
+          <th class="sub-category editable-category" [attr.colspan]="months.length + 1">
+            <input 
+              class="category-name-input" 
+              [(ngModel)]="category.name" 
+              placeholder="Enter category name" 
+            />
+          </th>
+          <th></th>
+        </tr>
+        
+        <tr *ngFor="let row of category.rows; let i = index; let last = last">
+          <td class="editable-label">
+            <input 
+              class="label-input" 
+              [(ngModel)]="row.label" 
+              placeholder="Enter label" 
+            />
+          </td>
+          <td *ngFor="let month of months; let colIndex = index">
+            <div class="input-container">
+              <input
+                [(ngModel)]="category.values[month][row.id]"
+                (change)="updateCustomCategoryValue(month, category.id, row.id, category.values[month][row.id])"
+                (focus)="onInputFocus($event, 6 + customGeneralIncomeRows.length + customOtherIncomeRows.length + i, colIndex)"
+                (contextmenu)="onRightClick($event, month, 'customCategory.' + category.id + '.' + row.id)"
+              />
+            </div>
+          </td>
+          <td class="add-icon-cell" *ngIf="last">
+            <span 
+              class="add-row-icon" 
+              (click)="addCustomRowToCategory(category.id)" 
+              tabindex="0" 
+              role="button" 
+              (keydown.enter)="addCustomRowToCategory(category.id)"
+              aria-label="Add new row to custom category">+</span>
+          </td>
+          <td *ngIf="!last"></td>
+        </tr>
+        
+        <tr *ngIf="category.rows.length === 0">
+          <td class="editable-label">Add a row</td>
+          <td *ngFor="let month of months"></td>
+          <td class="add-icon-cell">
+            <span 
+              class="add-row-icon" 
+              (click)="addCustomRowToCategory(category.id)" 
+              tabindex="0" 
+              role="button" 
+              (keydown.enter)="addCustomRowToCategory(category.id)"
+              aria-label="Add new row to custom category">+</span>
+          </td>
+        </tr>
+        
+        <tr>
+          <td>Subtotal</td>
+          <td *ngFor="let month of months" class="subtotal">
+            {{ category.values[month].subTotal | number : "1.2-2" }}
+          </td>
+          <td></td>
+        </tr>
+      </ng-container>
+
       <tr>
-        <th [attr.colspan]="months.length + 1">Operational Expenses</th>
+        <th class="main-category" [attr.colspan]="months.length + 1">Expenses</th>
+        <th class="action-column category-action-column">
+          <span 
+            class="add-category-icon" 
+            (click)="addCustomCategory('expenses')" 
+            tabindex="0" 
+            role="button" 
+            (keydown.enter)="addCustomCategory('expenses')"
+            aria-label="Add new expense category">New Expense Category</span>
+        </th>
+      </tr>
+      
+      <tr>
+        <th class="sub-category" [attr.colspan]="months.length + 1">Operational Expenses</th>
+        <th></th>
       </tr>
       <tr>
         <td>Management Fees</td>
         <td *ngFor="let month of months; let colIndex = index">
-          <input
-            [(ngModel)]="budgetData[month].expenses.operationalExpenses.managementFees"
-            (change)="calculateTotals(month)"
-            (focus)="onInputFocus($event, 4, colIndex)"
-          />
+          <div class="input-container">
+            <input
+              [(ngModel)]="budgetData[month].expenses.operationalExpenses.managementFees"
+              (change)="calculateTotals(month)"
+              (focus)="onInputFocus($event, 6 + customGeneralIncomeRows.length + customOtherIncomeRows.length, colIndex)"
+              (contextmenu)="onRightClick($event, month, 'expenses.operationalExpenses.managementFees')"
+            />
+          </div>
         </td>
+        <td></td>
       </tr>
       <tr>
         <td>Cloud Hosting</td>
         <td *ngFor="let month of months; let colIndex = index">
-          <input
-            [(ngModel)]="budgetData[month].expenses.operationalExpenses.cloudHosting"
-            (change)="calculateTotals(month)"
-            (focus)="onInputFocus($event, 5, colIndex)"
+          <div class="input-container">
+            <input
+              [(ngModel)]="budgetData[month].expenses.operationalExpenses.cloudHosting"
+              (change)="calculateTotals(month)"
+              (focus)="onInputFocus($event, 7 + customGeneralIncomeRows.length + customOtherIncomeRows.length, colIndex)"
+              (contextmenu)="onRightClick($event, month, 'expenses.operationalExpenses.cloudHosting')"
+            />
+          </div>
+        </td>
+        <td class="add-icon-cell" *ngIf="customOperationalExpenseRows.length === 0">
+          <span 
+            class="add-row-icon" 
+            (click)="addCustomRowForCategory('operationalExpenses')" 
+            tabindex="0" 
+            role="button" 
+            (keydown.enter)="addCustomRowForCategory('operationalExpenses')"
+            aria-label="Add new operational expense row">+</span>
+        </td>
+        <td *ngIf="customOperationalExpenseRows.length > 0"></td>
+      </tr>
+      
+      <tr *ngFor="let customRow of customOperationalExpenseRows; let i = index; let last = last">
+        <td class="editable-label">
+          <input 
+            class="label-input" 
+            [(ngModel)]="customRow.label" 
+            placeholder="Enter label" 
           />
         </td>
+        <td *ngFor="let month of months; let colIndex = index">
+          <div class="input-container">
+            <input
+              [(ngModel)]="budgetData[month].expenses.operationalExpenses[customRow.id]"
+              (change)="calculateTotals(month)"
+              (focus)="onInputFocus($event, 8 + customGeneralIncomeRows.length + customOtherIncomeRows.length + i, colIndex)"
+              (contextmenu)="onRightClick($event, month, 'expenses.operationalExpenses.' + customRow.id)"
+            />
+          </div>
+        </td>
+        <td class="add-icon-cell" *ngIf="last">
+          <span 
+            class="add-row-icon" 
+            (click)="addCustomRowForCategory('operationalExpenses')" 
+            tabindex="0" 
+            role="button" 
+            (keydown.enter)="addCustomRowForCategory('operationalExpenses')"
+            aria-label="Add new operational expense row">+</span>
+        </td>
+        <td *ngIf="!last"></td>
       </tr>
+      
       <tr>
         <td>Subtotal</td>
         <td *ngFor="let month of months" class="subtotal">
@@ -97,56 +356,181 @@
             budgetData[month].expenses.operationalExpenses.subTotal | number : "1.2-2"
           }}
         </td>
+        <td></td>
       </tr>
 
       <tr>
-        <th [attr.colspan]="months.length + 1">Salaries & Wages</th>
+        <th class="sub-category" [attr.colspan]="months.length + 1">Salaries & Wages</th>
+        <th></th>
       </tr>
       <tr>
         <td>Full-time Dev</td>
         <td *ngFor="let month of months; let colIndex = index">
-          <input
-            [(ngModel)]="budgetData[month].expenses.salariesAndWages.fullTimeDevSalaries"
-            (change)="calculateTotals(month)"
-            (focus)="onInputFocus($event, 6, colIndex)"
-          />
+          <div class="input-container">
+            <input
+              [(ngModel)]="budgetData[month].expenses.salariesAndWages.fullTimeDevSalaries"
+              (change)="calculateTotals(month)"
+              (focus)="onInputFocus($event, 9 + customGeneralIncomeRows.length + customOtherIncomeRows.length + customOperationalExpenseRows.length, colIndex)"
+              (contextmenu)="onRightClick($event, month, 'expenses.salariesAndWages.fullTimeDevSalaries')"
+            />
+          </div>
         </td>
+        <td></td>
       </tr>
       <tr>
         <td>Part-time Dev</td>
         <td *ngFor="let month of months; let colIndex = index">
-          <input
-            [(ngModel)]="budgetData[month].expenses.salariesAndWages.partTimeDevSalaries"
-            (change)="calculateTotals(month)"
-            (focus)="onInputFocus($event, 7, colIndex)"
-          />
+          <div class="input-container">
+            <input
+              [(ngModel)]="budgetData[month].expenses.salariesAndWages.partTimeDevSalaries"
+              (change)="calculateTotals(month)"
+              (focus)="onInputFocus($event, 10 + customGeneralIncomeRows.length + customOtherIncomeRows.length + customOperationalExpenseRows.length, colIndex)"
+              (contextmenu)="onRightClick($event, month, 'expenses.salariesAndWages.partTimeDevSalaries')"
+            />
+          </div>
         </td>
+        <td></td>
       </tr>
       <tr>
         <td>Remote</td>
         <td *ngFor="let month of months; let colIndex = index">
-          <input
-            [(ngModel)]="budgetData[month].expenses.salariesAndWages.remoteSalaries"
-            (change)="calculateTotals(month)"
-            (focus)="onInputFocus($event, 8, colIndex)"
+          <div class="input-container">
+            <input
+              [(ngModel)]="budgetData[month].expenses.salariesAndWages.remoteSalaries"
+              (change)="calculateTotals(month)"
+              (focus)="onInputFocus($event, 11 + customGeneralIncomeRows.length + customOtherIncomeRows.length + customOperationalExpenseRows.length, colIndex)"
+              (contextmenu)="onRightClick($event, month, 'expenses.salariesAndWages.remoteSalaries')"
+            />
+          </div>
+        </td>
+        <td class="add-icon-cell" *ngIf="customSalaryExpenseRows.length === 0">
+          <span 
+            class="add-row-icon" 
+            (click)="addCustomRowForCategory('salariesAndWages')" 
+            tabindex="0" 
+            role="button" 
+            (keydown.enter)="addCustomRowForCategory('salariesAndWages')"
+            aria-label="Add new salary expense row">+</span>
+        </td>
+        <td *ngIf="customSalaryExpenseRows.length > 0"></td>
+      </tr>
+      
+      <tr *ngFor="let customRow of customSalaryExpenseRows; let i = index; let last = last">
+        <td class="editable-label">
+          <input 
+            class="label-input" 
+            [(ngModel)]="customRow.label" 
+            placeholder="Enter label" 
           />
         </td>
+        <td *ngFor="let month of months; let colIndex = index">
+          <div class="input-container">
+            <input
+              [(ngModel)]="budgetData[month].expenses.salariesAndWages[customRow.id]"
+              (change)="calculateTotals(month)"
+              (focus)="onInputFocus($event, 12 + customGeneralIncomeRows.length + customOtherIncomeRows.length + customOperationalExpenseRows.length + i, colIndex)"
+              (contextmenu)="onRightClick($event, month, 'expenses.salariesAndWages.' + customRow.id)"
+            />
+          </div>
+        </td>
+        <td class="add-icon-cell" *ngIf="last">
+          <span 
+            class="add-row-icon" 
+            (click)="addCustomRowForCategory('salariesAndWages')" 
+            tabindex="0" 
+            role="button" 
+            (keydown.enter)="addCustomRowForCategory('salariesAndWages')"
+            aria-label="Add new salary expense row">+</span>
+        </td>
+        <td *ngIf="!last"></td>
       </tr>
+      
       <tr>
         <td>Subtotal</td>
         <td *ngFor="let month of months" class="subtotal">
           {{ budgetData[month].expenses.salariesAndWages.subTotal | number : "1.2-2" }}
         </td>
+        <td></td>
+      </tr>
+
+      <ng-container *ngFor="let category of customExpenseCategories">
+        <tr>
+          <th class="sub-category editable-category" [attr.colspan]="months.length + 1">
+            <input 
+              class="category-name-input" 
+              [(ngModel)]="category.name" 
+              placeholder="Enter category name" 
+            />
+          </th>
+          <th></th>
+        </tr>
+        
+        <tr *ngFor="let row of category.rows; let i = index; let last = last">
+          <td class="editable-label">
+            <input 
+              class="label-input" 
+              [(ngModel)]="row.label" 
+              placeholder="Enter label" 
+            />
+          </td>
+          <td *ngFor="let month of months; let colIndex = index">
+            <div class="input-container">
+              <input
+                [(ngModel)]="category.values[month][row.id]"
+                (change)="updateCustomCategoryValue(month, category.id, row.id, category.values[month][row.id])"
+                (focus)="onInputFocus($event, 13 + customGeneralIncomeRows.length + customOtherIncomeRows.length + customOperationalExpenseRows.length + customSalaryExpenseRows.length + i, colIndex)"
+                (contextmenu)="onRightClick($event, month, 'customCategory.' + category.id + '.' + row.id)"
+              />
+            </div>
+          </td>
+          <td class="add-icon-cell" *ngIf="last">
+            <span 
+              class="add-row-icon" 
+              (click)="addCustomRowToCategory(category.id)" 
+              tabindex="0" 
+              role="button" 
+              (keydown.enter)="addCustomRowToCategory(category.id)"
+              aria-label="Add new row to custom category">+</span>
+          </td>
+          <td *ngIf="!last"></td>
+        </tr>
+        
+        <tr *ngIf="category.rows.length === 0">
+          <td class="editable-label">Add a row</td>
+          <td *ngFor="let month of months"></td>
+          <td class="add-icon-cell">
+            <span 
+              class="add-row-icon" 
+              (click)="addCustomRowToCategory(category.id)" 
+              tabindex="0" 
+              role="button" 
+              (keydown.enter)="addCustomRowToCategory(category.id)"
+              aria-label="Add new row to custom category">+</span>
+          </td>
+        </tr>
+        
+        <tr>
+          <td>Subtotal</td>
+          <td *ngFor="let month of months" class="subtotal">
+            {{ category.values[month].subTotal | number : "1.2-2" }}
+          </td>
+          <td></td>
+        </tr>
+      </ng-container>
+
+      <tr>
+        <td [attr.colspan]="months.length + 2" class="empty-row"></td>
       </tr>
 
       <tr>
-        <td>Total Expenses</td>
+        <td><b>Total Expenses</b></td>
         <td *ngFor="let month of months" class="total">
           {{ budgetData[month].totalExpenses | number : "1.2-2" }}
         </td>
+        <td></td>
       </tr>
       <tr>
-        <td>Profit/Loss</td>
+        <td><b>Profit/Loss</b></td>
         <td
           *ngFor="let month of months"
           [ngClass]="{
@@ -156,30 +540,22 @@
         >
           {{ budgetData[month].profitLoss | number : "1.2-2" }}
         </td>
+        <td></td>
       </tr>
       <tr>
-        <td>Opening Balance</td>
+        <td><b>Opening Balance</b></td>
         <td *ngFor="let month of months">
           {{ budgetData[month].openingBalance | number : "1.2-2" }}
         </td>
+        <td></td>
       </tr>
       <tr>
-        <td>Closing Balance</td>
+        <td><b>Closing Balance</b></td>
         <td *ngFor="let month of months" class="closing-balance">
           {{ budgetData[month].closingBalance | number : "1.2-2" }}
         </td>
+        <td></td>
       </tr>
     </tbody>
   </table>
-
-  <div
-    class="context-menu"
-    *ngIf="contextMenuVisible"
-    [style.left.px]="contextMenuX"
-    [style.top.px]="contextMenuY"
-  >
-    <div class="context-menu-item" (click)="applyToAllCells()">
-      Apply to all
-    </div>
-  </div>
 </div>
