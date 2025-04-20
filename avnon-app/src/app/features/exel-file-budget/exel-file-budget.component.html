@@ -14,7 +14,7 @@
         <td>Sales</td>
         <td *ngFor="let month of months; let colIndex = index">
           <input
-            [(ngModel)]="budgetData[month].generalIncome.sales"
+            [(ngModel)]="budgetData[month].income.generalIncome.sales"
             (change)="calculateTotals(month)"
             (focus)="onInputFocus($event, 0, colIndex)"
           />
@@ -24,7 +24,7 @@
         <td>Commission</td>
         <td *ngFor="let month of months; let colIndex = index">
           <input
-            [(ngModel)]="budgetData[month].generalIncome.commission"
+            [(ngModel)]="budgetData[month].income.generalIncome.commission"
             (change)="calculateTotals(month)"
             (focus)="onInputFocus($event, 1, colIndex)"
           />
@@ -33,7 +33,7 @@
       <tr>
         <td>Subtotal</td>
         <td *ngFor="let month of months" class="subtotal">
-          {{ budgetData[month].generalIncome.subTotal | number : "1.2-2" }}
+          {{ budgetData[month].income.generalIncome.subTotal | number : "1.2-2" }}
         </td>
       </tr>
 
@@ -44,7 +44,7 @@
         <td>Training</td>
         <td *ngFor="let month of months; let colIndex = index">
           <input
-            [(ngModel)]="budgetData[month].otherIncome.training"
+            [(ngModel)]="budgetData[month].income.otherIncome.training"
             (change)="calculateTotals(month)"
             (focus)="onInputFocus($event, 2, colIndex)"
           />
@@ -54,7 +54,7 @@
         <td>Consulting</td>
         <td *ngFor="let month of months; let colIndex = index">
           <input
-            [(ngModel)]="budgetData[month].otherIncome.consulting"
+            [(ngModel)]="budgetData[month].income.otherIncome.consulting"
             (change)="calculateTotals(month)"
             (focus)="onInputFocus($event, 3, colIndex)"
           />
@@ -63,7 +63,7 @@
       <tr>
         <td>Subtotal</td>
         <td *ngFor="let month of months" class="subtotal">
-          {{ budgetData[month].otherIncome.subTotal | number : "1.2-2" }}
+          {{ budgetData[month].income.otherIncome.subTotal | number : "1.2-2" }}
         </td>
       </tr>
 
@@ -74,7 +74,7 @@
         <td>Management Fees</td>
         <td *ngFor="let month of months; let colIndex = index">
           <input
-            [(ngModel)]="budgetData[month].operationalExpenses.managementFees"
+            [(ngModel)]="budgetData[month].expenses.operationalExpenses.managementFees"
             (change)="calculateTotals(month)"
             (focus)="onInputFocus($event, 4, colIndex)"
           />
@@ -84,7 +84,7 @@
         <td>Cloud Hosting</td>
         <td *ngFor="let month of months; let colIndex = index">
           <input
-            [(ngModel)]="budgetData[month].operationalExpenses.cloudHosting"
+            [(ngModel)]="budgetData[month].expenses.operationalExpenses.cloudHosting"
             (change)="calculateTotals(month)"
             (focus)="onInputFocus($event, 5, colIndex)"
           />
@@ -94,7 +94,7 @@
         <td>Subtotal</td>
         <td *ngFor="let month of months" class="subtotal">
           {{
-            budgetData[month].operationalExpenses.subTotal | number : "1.2-2"
+            budgetData[month].expenses.operationalExpenses.subTotal | number : "1.2-2"
           }}
         </td>
       </tr>
@@ -106,7 +106,7 @@
         <td>Full-time Dev</td>
         <td *ngFor="let month of months; let colIndex = index">
           <input
-            [(ngModel)]="budgetData[month].salariesAndWages.fullTimeDevSalaries"
+            [(ngModel)]="budgetData[month].expenses.salariesAndWages.fullTimeDevSalaries"
             (change)="calculateTotals(month)"
             (focus)="onInputFocus($event, 6, colIndex)"
           />
@@ -116,7 +116,7 @@
         <td>Part-time Dev</td>
         <td *ngFor="let month of months; let colIndex = index">
           <input
-            [(ngModel)]="budgetData[month].salariesAndWages.partTimeDevSalaries"
+            [(ngModel)]="budgetData[month].expenses.salariesAndWages.partTimeDevSalaries"
             (change)="calculateTotals(month)"
             (focus)="onInputFocus($event, 7, colIndex)"
           />
@@ -126,7 +126,7 @@
         <td>Remote</td>
         <td *ngFor="let month of months; let colIndex = index">
           <input
-            [(ngModel)]="budgetData[month].salariesAndWages.remoteSalaries"
+            [(ngModel)]="budgetData[month].expenses.salariesAndWages.remoteSalaries"
             (change)="calculateTotals(month)"
             (focus)="onInputFocus($event, 8, colIndex)"
           />
@@ -135,7 +135,7 @@
       <tr>
         <td>Subtotal</td>
         <td *ngFor="let month of months" class="subtotal">
-          {{ budgetData[month].salariesAndWages.subTotal | number : "1.2-2" }}
+          {{ budgetData[month].expenses.salariesAndWages.subTotal | number : "1.2-2" }}
         </td>
       </tr>
 

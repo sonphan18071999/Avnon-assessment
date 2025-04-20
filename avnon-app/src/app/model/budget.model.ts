@@ -28,12 +28,23 @@ export interface SalariesAndWages {
 }
 
 export interface Budget {
-  generalIncome: GeneralIncome;
-  otherIncome: OtherIncome;
-  operationalExpenses: OperationalExpenses;
-  salariesAndWages: SalariesAndWages;
+  income: Income;
+  expenses: Expenses;
   totalExpenses: number;
   profitLoss: number;
   openingBalance: number;
   closingBalance: number;
 }
+
+export interface Income {
+  generalIncome: GeneralIncome;
+  otherIncome: OtherIncome;
+  [key: string]: GeneralIncome | OtherIncome;
+}
+
+export interface Expenses {
+  operationalExpenses: OperationalExpenses;
+  salariesAndWages: SalariesAndWages;
+  [key: string]: OperationalExpenses | SalariesAndWages;
+}
+

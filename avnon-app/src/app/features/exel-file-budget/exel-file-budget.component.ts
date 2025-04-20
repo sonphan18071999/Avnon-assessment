@@ -22,9 +22,7 @@ import { MatNativeDateModule, DateAdapter } from '@angular/material/core';
 import { MatButtonModule } from '@angular/material/button';
 import {
   MatDatepicker,
-  MatDatepickerToggle,
 } from '@angular/material/datepicker';
-import { BudgetHeaderComponent } from '../budget-header/budget-header.component';
 
 interface DateRangeOutput {
   startDate: Date;
@@ -49,7 +47,6 @@ interface ExtendedBudget extends Budget {
     MatInputModule,
     MatNativeDateModule,
     MatButtonModule,
-    BudgetHeaderComponent,
   ],
   templateUrl: './exel-file-budget.component.html',
   styleUrl: './exel-file-budget.component.scss',
@@ -132,26 +129,30 @@ export class ExelFileBudgetComponent implements OnInit, AfterViewInit {
   ngOnInit(): void {
     this.allMonths.forEach((month, index) => {
       this.budgetData[month] = {
-        generalIncome: {
-          sales: 0,
-          commission: 0,
-          subTotal: 0,
+        income: {
+          generalIncome: {
+            sales: 0,
+            commission: 0,
+            subTotal: 0,
+          },
+          otherIncome: {
+            training: 0,
+            consulting: 0,
+            subTotal: 0,
+          }
         },
-        otherIncome: {
-          training: 0,
-          consulting: 0,
-          subTotal: 0,
-        },
-        operationalExpenses: {
-          managementFees: 0,
-          cloudHosting: 0,
-          subTotal: 0,
-        },
-        salariesAndWages: {
-          fullTimeDevSalaries: 0,
-          partTimeDevSalaries: 0,
-          remoteSalaries: 0,
-          subTotal: 0,
+        expenses: {
+          operationalExpenses: {
+            managementFees: 0,
+            cloudHosting: 0,
+            subTotal: 0,
+          },
+          salariesAndWages: {
+            fullTimeDevSalaries: 0,
+            partTimeDevSalaries: 0,
+            remoteSalaries: 0,
+            subTotal: 0,
+          }
         },
         totalExpenses: 0,
         profitLoss: 0,
@@ -271,26 +272,26 @@ export class ExelFileBudgetComponent implements OnInit, AfterViewInit {
         path = ngModelAttr.value.replace(`budgetData[${month}].`, '');
       }
 
-      if (path.includes('generalIncome')) {
-        if (path.includes('sales')) property = 'generalIncome.sales';
+      if (path.includes('income.generalIncome')) {
+        if (path.includes('sales')) property = 'income.generalIncome.sales';
         else if (path.includes('commission'))
-          property = 'generalIncome.commission';
-      } else if (path.includes('otherIncome')) {
-        if (path.includes('training')) property = 'otherIncome.training';
+          property = 'income.generalIncome.commission';
+      } else if (path.includes('income.otherIncome')) {
+        if (path.includes('training')) property = 'income.otherIncome.training';
         else if (path.includes('consulting'))
-          property = 'otherIncome.consulting';
-      } else if (path.includes('operationalExpenses')) {
+          property = 'income.otherIncome.consulting';
+      } else if (path.includes('expenses.operationalExpenses')) {
         if (path.includes('managementFees'))
-          property = 'operationalExpenses.managementFees';
+          property = 'expenses.operationalExpenses.managementFees';
         else if (path.includes('cloudHosting'))
-          property = 'operationalExpenses.cloudHosting';
-      } else if (path.includes('salariesAndWages')) {
+          property = 'expenses.operationalExpenses.cloudHosting';
+      } else if (path.includes('expenses.salariesAndWages')) {
         if (path.includes('fullTimeDevSalaries'))
-          property = 'salariesAndWages.fullTimeDevSalaries';
+          property = 'expenses.salariesAndWages.fullTimeDevSalaries';
         else if (path.includes('partTimeDevSalaries'))
-          property = 'salariesAndWages.partTimeDevSalaries';
+          property = 'expenses.salariesAndWages.partTimeDevSalaries';
         else if (path.includes('remoteSalaries'))
-          property = 'salariesAndWages.remoteSalaries';
+          property = 'expenses.salariesAndWages.remoteSalaries';
       }
 
       if (property) {
@@ -322,6 +323,11 @@ export class ExelFileBudgetComponent implements OnInit, AfterViewInit {
       const category = pathParts[0] as keyof ExtendedBudget;
       const field = pathParts[1];
       value = +(this.budgetData[month][category] as any)[field] || 0;
+    } else if (pathParts.length === 3) {
+      const category = pathParts[0] as keyof ExtendedBudget;
+      const subcategory = pathParts[1];
+      const field = pathParts[2];
+      value = +((this.budgetData[month][category] as any)[subcategory] as any)[field] || 0;
     }
 
     this.months.forEach((m) => {
@@ -333,6 +339,11 @@ export class ExelFileBudgetComponent implements OnInit, AfterViewInit {
           const category = pathParts[0] as keyof ExtendedBudget;
           const field = pathParts[1];
           (this.budgetData[m][category] as any)[field] = value;
+        } else if (pathParts.length === 3) {
+          const category = pathParts[0] as keyof ExtendedBudget;
+          const subcategory = pathParts[1];
+          const field = pathParts[2];
+          ((this.budgetData[m][category] as any)[subcategory] as any)[field] = value;
         }
 
         this.calculateTotals(m);
@@ -346,40 +357,38 @@ export class ExelFileBudgetComponent implements OnInit, AfterViewInit {
   calculateTotals(month: string): void {
     const budget = this.budgetData[month];
 
-    const sales = +budget.generalIncome.sales || 0;
-    const commission = +budget.generalIncome.commission || 0;
-    const training = +budget.otherIncome.training || 0;
-    const consulting = +budget.otherIncome.consulting || 0;
-    const managementFees = +budget.operationalExpenses.managementFees || 0;
-    const cloudHosting = +budget.operationalExpenses.cloudHosting || 0;
-    const fullTimeDevSalaries =
-      +budget.salariesAndWages.fullTimeDevSalaries || 0;
-    const partTimeDevSalaries =
-      +budget.salariesAndWages.partTimeDevSalaries || 0;
-    const remoteSalaries = +budget.salariesAndWages.remoteSalaries || 0;
+    const sales = +budget.income.generalIncome.sales || 0;
+    const commission = +budget.income.generalIncome.commission || 0;
+    const training = +budget.income.otherIncome.training || 0;
+    const consulting = +budget.income.otherIncome.consulting || 0;
+    const managementFees = +budget.expenses.operationalExpenses.managementFees || 0;
+    const cloudHosting = +budget.expenses.operationalExpenses.cloudHosting || 0;
+    const fullTimeDevSalaries = +budget.expenses.salariesAndWages.fullTimeDevSalaries || 0;
+    const partTimeDevSalaries = +budget.expenses.salariesAndWages.partTimeDevSalaries || 0;
+    const remoteSalaries = +budget.expenses.salariesAndWages.remoteSalaries || 0;
 
-    budget.generalIncome.sales = sales;
-    budget.generalIncome.commission = commission;
-    budget.otherIncome.training = training;
-    budget.otherIncome.consulting = consulting;
-    budget.operationalExpenses.managementFees = managementFees;
-    budget.operationalExpenses.cloudHosting = cloudHosting;
-    budget.salariesAndWages.fullTimeDevSalaries = fullTimeDevSalaries;
-    budget.salariesAndWages.partTimeDevSalaries = partTimeDevSalaries;
-    budget.salariesAndWages.remoteSalaries = remoteSalaries;
+    budget.income.generalIncome.sales = sales;
+    budget.income.generalIncome.commission = commission;
+    budget.income.otherIncome.training = training;
+    budget.income.otherIncome.consulting = consulting;
+    budget.expenses.operationalExpenses.managementFees = managementFees;
+    budget.expenses.operationalExpenses.cloudHosting = cloudHosting;
+    budget.expenses.salariesAndWages.fullTimeDevSalaries = fullTimeDevSalaries;
+    budget.expenses.salariesAndWages.partTimeDevSalaries = partTimeDevSalaries;
+    budget.expenses.salariesAndWages.remoteSalaries = remoteSalaries;
 
-    budget.generalIncome.subTotal = sales + commission;
-    budget.otherIncome.subTotal = training + consulting;
-    budget.operationalExpenses.subTotal = managementFees + cloudHosting;
-    budget.salariesAndWages.subTotal =
+    budget.income.generalIncome.subTotal = sales + commission;
+    budget.income.otherIncome.subTotal = training + consulting;
+    budget.expenses.operationalExpenses.subTotal = managementFees + cloudHosting;
+    budget.expenses.salariesAndWages.subTotal =
       fullTimeDevSalaries + partTimeDevSalaries + remoteSalaries;
 
     budget.totalExpenses =
-      budget.operationalExpenses.subTotal + budget.salariesAndWages.subTotal;
+      budget.expenses.operationalExpenses.subTotal + budget.expenses.salariesAndWages.subTotal;
 
     budget.profitLoss =
-      budget.generalIncome.subTotal +
-      budget.otherIncome.subTotal -
+      budget.income.generalIncome.subTotal +
+      budget.income.otherIncome.subTotal -
       budget.totalExpenses;
 
     budget.closingBalance = budget.openingBalance + budget.profitLoss;
